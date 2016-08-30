@@ -25,6 +25,8 @@ ex:
 
 #MySqlORM
 自动映射数据库，自动ORM
+
+
 缺陷：
   函数执行需要在内部新建seesion
   
