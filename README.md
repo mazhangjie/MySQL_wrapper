@@ -28,7 +28,7 @@ ex:
 
 
 缺陷：
-  函数执行需要在内部新建seesion
+  调用func执行需要在内部新建seesion
   
   
 
