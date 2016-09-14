@@ -11,7 +11,6 @@
     SET character_set_system='utf8';
 """
 
-import time
 from sqlalchemy import *
 from PwLogging import PwLogging
 from sqlalchemy.pool import NullPool
@@ -97,16 +96,26 @@ class FlaskORM(object):
         session.commit()
 
     def guuidMysql(self):
-        Session = sessionmaker(bind=self.engine)
-        session = Session()
-        number = session.query(func.guuid('')).scalar()
-        return number
+        try:
+            Session = sessionmaker(bind=self.engine)
+            session = Session()
+            number = session.query(func.guuid('')).scalar()
+            return number
+        except Exception, e:
+            self.logger.exception("%s" % e)
+        finally:
+            session.close()
 
     def selectMax(self, tableColumn, match=1):
-        Session = sessionmaker(bind=self.engine)
-        session = Session()
-        maxval = session.query(func.max(tableColumn)).filter(match).scalar()
-        return maxval
+        try:
+            Session = sessionmaker(bind=self.engine)
+            session = Session()
+            maxval = session.query(func.max(tableColumn)).filter(match).scalar()
+            return maxval
+        except Exception, e:
+            self.logger.exception("%s" % e)
+        finally:
+            session.close()
 
     def Close(self):
         self.engine.dispose()
