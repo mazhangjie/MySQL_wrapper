@@ -11,18 +11,19 @@
     SET character_set_system='utf8';
 """
 
-import time
 from sqlalchemy import *
 from PwLogging import PwLogging
 from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import *
 
 class FlaskORM(object):
-    def __init__(self, host, user, pwd, db, port=3306, logger=None, redo=True):
+    def __init__(self, host, user, pwd, tlist, tclass, db=None, port=3306, logger=None, redo=True):
         self.error = 0
         self.host = host
         self.user = user
         self.passwd = pwd
+        self.tlist = tlist
+        self.tclass= tclass
         self.db = db
         self.port = port
         self.logger = logger
@@ -32,29 +33,11 @@ class FlaskORM(object):
     def __del__(self):
         self.Close()
 
-    def tableList(self, databaseName):
-        result = mysql_orm.engine.execute("show tables from %s;" % databaseName)
-        if result:
-            tablesList = []
-            for row in result:
-                tablesList.append(row[0])
-            return tablesList
-        else:
-            #"the database no table"
-            return None
-
-    def tableUpper(self, lowerList):
-        upperList = []
-        for tableName in lowerList:
-            upperList.append(tableName.upper())
-        return upperList
-
     def tableLoad(self, list):
         dic = {}
         for tmp in list:
             dic[tmp] = Table(tmp, self.metadata, autoload=True)
         return dic
-
     def makeClass(self, class_name):
         class C(object):
             pass
@@ -81,8 +64,6 @@ class FlaskORM(object):
             CENGINE_URL = "mysql://%s:%s@%s:%s/%s?charset=utf8" \
                           % (self.user, self.passwd, self.host, self.port, self.db)
             self.engine = create_engine(CENGINE_URL, poolclass=NullPool, echo=True)
-            self.tlist = self.tableList(self.db)
-            self.tclass = self.tableUpper(self.tlist)
             self.metadata = MetaData(self.engine)
             self.tdic = self.tableLoad(self.tlist)
             self.tclass = self.makeClassList(self.tclass)
@@ -145,17 +126,16 @@ if __name__ == '__main__':
     db_password = 'a2RrajEyMw=='
     db = 'kdserver'
 
-    #list = 'app_member, app_order, app_order_details, app_const_listStatus'
+    list = 'test, app_all_brands, app_appraise_object, app_appraise_point, app_first_show, app_member, app_order, app_order_details, app_const_brands, app_const_category'
     #tlist = ['test', 'app_all_brands']
-    #tlist = list.split(', ')
-    #tclass = list.upper().split(', ')
+    tlist = list.split(', ')
+    tclass = list.upper().split(', ')
 
     LOGDIR = '/var/kdserver/log'
     logger = PwLogging(dir=LOGDIR)
     logger.addRotatingFileHandler('ORMtest.log', level='debug', fmt='simple')
 
-    #mysql_orm = FlaskORM(host=db_address, user=db_username, pwd=db_password, tlist=tlist, tclass=tclass, db=db, logger=logger)
-    mysql_orm = FlaskORM(host=db_address, user=db_username, pwd=db_password, db=db, logger=logger)
+    mysql_orm = FlaskORM(host=db_address, user=db_username, pwd=db_password, tlist=tlist, tclass=tclass, db=db, logger=logger)
     session = create_session()
     """
     tmpQuery = session.query(mysql_orm.tclass['TEST']).filter_by(name='p1').first()
@@ -171,16 +151,4 @@ if __name__ == '__main__':
 
     number = mysql_orm.guuidMysql()
     print number
-
-    session.query(mysql_orm.tclass['APP_ORDER_DETAILS']).filter_by(orderId=74).update({'picStatusId':None, 'picStatus': '2222'})
-    #session.commit()
-    tmpQuery = session.query(mysql_orm.tclass['APP_ORDER_DETAILS']).filter_by(orderId=74).first()
-    print tmpQuery.picStatusId
 """
-    result = mysql_orm.engine.execute("show tables from test;")
-    if result:
-        tablesList = []
-        for row in result:
-            tablesList.append(row[0])
-    else:
-        print "the database no table"
