@@ -114,27 +114,35 @@ class FlaskORM(object):
         session.flush()
         session.commit()
 
-    def guuidMysql(self):
+#    def guuidMysql(self):
+#        try:
+#            Session = sessionmaker(bind=self.engine)
+#            session = Session()
+#            number = session.query(func.guuid('')).scalar()
+#            return number
+#        except Exception, e:
+#            self.logger.exception("%s" % e)
+#        finally:
+#            session.close()
+#
+#    def selectMax(self, tableColumn, match=1):
+#        try:
+#            Session = sessionmaker(bind=self.engine)
+#            session = Session()
+#            maxval = session.query(func.max(tableColumn)).filter(match).scalar()
+#            return maxval
+#        except Exception, e:
+#            self.logger.exception("%s" % e)
+#        finally:
+#            session.close()
+#
+    def getSession(self):
         try:
             Session = sessionmaker(bind=self.engine)
             session = Session()
-            number = session.query(func.guuid('')).scalar()
-            return number
+            return session
         except Exception, e:
             self.logger.exception("%s" % e)
-        finally:
-            session.close()
-
-    def selectMax(self, tableColumn, match=1):
-        try:
-            Session = sessionmaker(bind=self.engine)
-            session = Session()
-            maxval = session.query(func.max(tableColumn)).filter(match).scalar()
-            return maxval
-        except Exception, e:
-            self.logger.exception("%s" % e)
-        finally:
-            session.close()
 
     def Close(self):
         self.engine.dispose()
